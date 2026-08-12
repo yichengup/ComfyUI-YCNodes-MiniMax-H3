@@ -52,7 +52,6 @@ ComfyUI-YCNodes-MiniMax-H3/
 ```
 
 ## 使用建议
+按这个值设置，就是默认值
 
-- **第一次使用**：从 `extra_steps=1`、`spacing=cosine` 起步，逐步加大。
-- **高速运动场景**（动作、奔跑、镜头快速移动）：适当提高 `extra_steps`（2~4）并调低 `start_at_sigma`，让更多低噪步参与精修。
-- **追求速度**：保持 `extra_steps=0`（等效直通，节点零开销）或直接断开本节点。
+<img width="444" height="253" alt="image" src="https://github.com/user-attachments/assets/6bbb04a6-d5bb-4dbc-85c9-5885eb9d43fb" />
