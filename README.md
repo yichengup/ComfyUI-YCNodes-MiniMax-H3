@@ -1,4 +1,5 @@
 # ComfyUI-YCNodes-MiniMax-H3
+推荐只接我的节点：调度器-我的节点-采样器
 
 专为 MiniMax H3 视频模型打造的 ComfyUI 节点包。当前包含 **H3 Sigma Refiner**——针对 H3 高动态场景的低噪声细节精修器。
 
