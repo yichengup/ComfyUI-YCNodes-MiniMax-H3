@@ -43,7 +43,7 @@ class H3SigmaRefiner:
     RETURN_TYPES = ("SIGMAS",)
     RETURN_NAMES = ("sigmas",)
     FUNCTION = "refine_sigmas"
-    CATEGORY = "YCNodes-MiniMax-H3/Sampling"
+    CATEGORY = "YCNodes-MiniMax-H3/scheduler"
     DESCRIPTION = "针对 H3 视频模型高动态场景优化。在低噪点区（低 Sigma）局部加密采样步长，消解运动物体的边缘像素颗粒。"
 
     def refine_sigmas(self, sigmas, extra_steps, start_at_sigma, end_at_sigma, spacing):
