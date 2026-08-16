@@ -1,11 +1,6 @@
 # ComfyUI-YCNodes-MiniMax-H3
 
-### 第一推荐用官方配置，不用安装我的节点，有更好的就推荐给大家
-<img width="1010" height="414" alt="image" src="https://github.com/user-attachments/assets/1b86e217-05ae-4904-a973-cf1303c9ceaa" />
-
-
-
-### 这个不必要安装我的节点，虽然有效果，我的节点：调度器-我的节点-采样器
+### 我的节点：调度器-我的节点-采样器
 
 专为 MiniMax H3 视频模型打造的 ComfyUI 节点包。当前包含 **H3 Sigma Refiner**——针对 H3 高动态场景的低噪声细节精修器。
 
