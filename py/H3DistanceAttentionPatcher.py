@@ -26,15 +26,15 @@ class H3DistanceAttentionPatcher:
             "required": {
                 "model": ("MODEL", {"tooltip": "输入的 MiniMax H3 视频模型。"}),
                 "receptive_field_scale": ("FLOAT", {
-                    "default": 15.0, "min": 1.0, "max": 100.0, "step": 0.5,
+                    "default": 1.0, "min": 1.0, "max": 100.0, "step": 0.5,
                     "tooltip": "感受野尺度因子。数值越小，注意力越局限于局部（抗干扰越强）；数值越大越接近全局注意力。"
                 }),
                 "temporal_weight": ("FLOAT", {
-                    "default": 2.0, "min": 0.1, "max": 10.0, "step": 0.1,
+                    "default": 3.0, "min": 0.1, "max": 10.0, "step": 0.1,
                     "tooltip": "时间轴相对于空间轴的距离权重。"
                 }),
                 "start_at_sigma": ("FLOAT", {
-                    "default": 4.5, "min": 0.0, "max": 20.0, "step": 0.1,
+                    "default": 2.5, "min": 0.0, "max": 20.0, "step": 0.1,
                     "tooltip": "开始应用距离限制的 Sigma 阈值。建议 3.0 ~ 5.0（避开前几步的宏观构图期）。"
                 }),
                 "end_at_sigma": ("FLOAT", {
