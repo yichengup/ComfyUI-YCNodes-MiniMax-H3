@@ -53,7 +53,7 @@ latent ────────────────────────�
 | `model` | MODEL | - | - | H3 模型 |
 | `receptive_field_scale` | FLOAT | 1.0 | 1.0 ~ 100.0 | 感受野尺度，越小越局部 |
 | `temporal_weight` | FLOAT | 3.0 | 0.1 ~ 10.0 | 时间轴相对空间轴的距离权重 |
-| `start_at_sigma` | FLOAT | 3.5 | 0.0 ~ 20.0 | 开始约束的 Sigma 阈值 |
+| `start_at_sigma` | FLOAT | 2.5 | 0.0 ~ 20.0 | 开始约束的 Sigma 阈值 |
 | `end_at_sigma` | FLOAT | 0.0 | 0.0 ~ 5.0 | 结束约束的 Sigma 阈值 |
 | `num_frames` | INT | 17 | 1 ~ 256 | 视频总帧数 |
 | `original_width` | INT | 864 | 128 ~ 2048 | 视频宽度 |
