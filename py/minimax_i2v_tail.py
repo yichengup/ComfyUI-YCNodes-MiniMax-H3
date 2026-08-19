@@ -134,7 +134,7 @@ class MiniMaxH3ImageToVideoTail(io.ComfyNode):
         return io.Schema(
             node_id="MiniMaxH3ImageToVideoTail",
             display_name="MiniMax H3 Image to Video (Tail)",
-            category="model/conditioning/minimax",
+            category="YCNodes-MiniMax-H3/conditioning",
             description=(
                 "二采版 Image-to-Video 条件节点。video_latent 传入时透传该 "
                 "latent（而非生成空 latent），并按实际帧数重算关键帧锚点，"
@@ -213,5 +213,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "MiniMaxH3ImageToVideoTail": "MiniMax H3 Image to Video (二采)",
+    "MiniMaxH3ImageToVideoTail": "MiniMax H3 Image to Video (Tail)",
 }
