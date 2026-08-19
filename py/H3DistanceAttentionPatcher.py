@@ -59,7 +59,7 @@ class H3DistanceAttentionPatcher:
     RETURN_TYPES = ("MODEL",)
     RETURN_NAMES = ("model",)
     FUNCTION = "patch_attention"
-    CATEGORY = "MiniMax-H3/注意力"
+    CATEGORY = "YCNodes-MiniMax-H3/attention"
     DESCRIPTION = "通过高斯距离惩罚强制限制自注意力感受野，阻断大面积背景对微小手部/脸部的特征同化与扯碎。"
 
     def patch_attention(self, model, receptive_field_scale, temporal_weight, start_at_sigma, end_at_sigma, num_frames, original_width, original_height):
