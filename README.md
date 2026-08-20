@@ -1,6 +1,6 @@
 # ComfyUI-YCNodes-MiniMax-H3
 
-专为 MiniMax H3 视频模型打造的 ComfyUI 节点包，包含 5 个节点，覆盖二采条件注入、时间分段提示词控制、注意力感受野约束、动态 CFG 调度和低噪细节精修。
+专为 MiniMax H3 视频模型打造的 ComfyUI 节点包，包含 6 个节点，覆盖二采条件注入、时间分段提示词控制、注意力感受野约束、动态 CFG 调度、低噪细节精修和空间分块采样。
 
 无第三方依赖，仅需 PyTorch。
 
@@ -15,6 +15,7 @@
 | H3 Distance Attention Patcher | 注意力 | 时空高斯感受野遮罩，防止背景同化局部细节 |
 | H3 Dynamic CFG Scheduler | scheduler | 根据去噪阶段动态调整 CFG 引导强度 |
 | H3 Sigma Refiner | scheduler | 低噪区间局部加步，消除运动边缘像素颗粒 |
+| H3 Tiled Sampler | sampling | 空间分块采样，cosine 融合，解决高分辨率显存瓶颈 |
 
 ---
 
@@ -124,6 +125,32 @@ BasicScheduler -> (sigmas) -> H3 Sigma Refiner -> (sigmas) -> SamplerCustomAdvan
 
 ---
 
+## 6. H3 Tiled Sampler（空间分块采样）
+
+**原理：** 768p/2K 高分辨率上采样精修时，H3 DiT 打包自注意力的 token 数远超训练分布，导致显存爆炸或画面质量下降。本节点沿 H 或 W 轴空间分块，每块独立采样后 cosine 窗口融合，严格保持 H3 视频/音频独立模态，音频 passthrough 不参与采样。
+
+**接线：** 替代 `SamplerCustomAdvanced`，接入 noise / guider / sampler / sigmas / latent_image。
+
+**适用场景：** 二采高清精修（低噪起步），不适用重去噪（纯噪声起点会破坏全局一致性）。
+
+| 参数 | 类型 | 默认值 | 范围 | 说明 |
+|------|------|--------|------|------|
+| `noise` | NOISE | - | - | H3 噪声生成器 |
+| `guider` | GUIDER | - | - | H3 CFG/STG guider |
+| `sampler` | SAMPLER | - | - | 采样算法 |
+| `sigmas` | SIGMAS | - | - | H3 噪声调度 |
+| `latent_image` | LATENT | - | - | H3 video latent |
+| `bypass_tiling` | BOOLEAN | False | - | True 时单次采样，等同 SamplerCustomAdvanced |
+| `tile_axis` | COMBO | auto | auto / H / W | 分块轴，auto 取较长轴 |
+| `n_tiles` | INT | 2 | 1 ~ 8 | 分块数，1 等同 bypass |
+| `tile_overlap` | INT | 8 | 0 ~ 32 | 相邻块在 latent 域的重叠 token 数 |
+| `max_size_for_no_tile` | INT | 24 | 8 ~ 256 | 目标轴 ≤ 此值时自动 bypass |
+| `target_frames` | INT | 17 | 1 ~ 512 | 最小帧数保护（非截断），不足时补齐 |
+| `frame_padding_mode` | COMBO | replicate_last | replicate_last / zero / error | 帧数不足时的填充方式 |
+| `debug` | BOOLEAN | False | - | 打印每个 tile 的 shape 和 value range |
+
+---
+
 ## 安装
 
 1. 将 `ComfyUI-YCNodes-MiniMax-H3` 目录放入 `ComfyUI/custom_nodes/` 下。
@@ -142,11 +169,13 @@ BasicScheduler -> (sigmas) -> H3 Sigma Refiner -> (sigmas) -> SamplerCustomAdvan
 [BasicScheduler] -> [H3SigmaRefiner] -> SIGMAS ──────────────────────────────────────────────┘
 ```
 
-**二采（高清精修，Tail 节点续跑）：**
+**二采（高清精修，Tail 节点续跑，Tiled 采样）：**
 ```
 一采LATENT -> video_latent ─┐
 [图像] -> [MiniMaxH3ImageToVideoTail] -> COND ─┐
 [CLIP] ────────────────────────────────────────┤
-                                                ├─> [H3PromptRelay] -> MODEL -> [采样器]
-                                                LATENT ───────────────────────┘
+                                                ├─> [H3PromptRelay] -> MODEL -> [H3DynamicCFGScheduler] -> MODEL ─┐
+                                                LATENT ───────────────────────────────────────────────────────────┤
+                                                                                                                   ├─> [H3TiledSampler] -> LATENT
+[BasicScheduler] -> [H3SigmaRefiner] -> SIGMAS ────────────────────────────────────────────────────────────────────┘
 ```
