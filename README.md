@@ -64,6 +64,7 @@ latent ────────────────────────�
 | `local_prompts` | STRING | 空 | 分段提示词，用 `\|` 分隔 |
 | `segment_lengths` | STRING | 空 | 逗号分隔的像素帧数，留空自动均分 |
 | `epsilon` | FLOAT | 0.001 | 惩罚衰减参数，越小边界越锐利 |
+| `patch_ratio` | FLOAT | 1.0 | 0.0~1.0，打 patch 的 DiT Block 比例。有语音时建议 0.3~0.7 |
 
 ---
 
