@@ -266,22 +266,34 @@ def _patched_attn_forward(self, x, rope_freqs=None, transformer_options={}):
     return self.out_proj(out.squeeze(0))
 
 
-def _apply_h3_patches(model_clone):
-    """对 H3 模型的每个 DiTBlock.attn.forward 打 patch."""
+def _apply_h3_patches(model_clone, patch_ratio=1.0):
+    """对 H3 模型的 DiTBlock.attn.forward 打 patch.
+
+    patch_ratio: 0.0~1.0, 控制从哪个比例开始打 patch.
+        1.0 = 全部层 (默认, 分段控制最强, 但音频可能受影响)
+        0.5 = 后 50% 层 (浅层保留原始交互, 音频更稳定)
+        0.0 = 不 patch (等于没开 Prompt Relay)
+    """
     diff_model = model_clone.get_model_object("diffusion_model")
 
     if not hasattr(diff_model, "blocks"):
         raise RuntimeError("H3PromptRelay: 模型没有 blocks 属性，不是 H3 模型")
 
-    for i, block in enumerate(diff_model.blocks):
-        attn = block.attn
+    total = len(diff_model.blocks)
+    start_idx = max(0, int(total * (1.0 - patch_ratio)))
+    patched = 0
+
+    for i in range(start_idx, total):
+        attn = diff_model.blocks[i].attn
         key = f"diffusion_model.blocks.{i}.attn.forward"
         model_clone.add_object_patch(
             key,
             types.MethodType(_patched_attn_forward, attn)
         )
+        patched += 1
 
-    _LOG.info("H3PromptRelay: 已 patch %d 个 DiTBlock 的 Attention 层", len(diff_model.blocks))
+    _LOG.info("H3PromptRelay: patch_ratio=%.2f, 已 patch 第 %d~%d 层 (共 %d/%d 层)",
+              patch_ratio, start_idx, total - 1, patched, total)
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -336,6 +348,10 @@ class H3PromptRelay:
                     "default": 0.001, "min": 1e-6, "max": 0.99, "step": 0.0001,
                     "tooltip": "惩罚衰减参数。越小边界越锐利（默认 0.001）。增大可柔化段间过渡。"
                 }),
+                "patch_ratio": ("FLOAT", {
+                    "default": 1.0, "min": 0.0, "max": 1.0, "step": 0.05,
+                    "tooltip": "DiT Block 打 patch 比例。1.0=全部层(分段控制最强,默认), 0.5=后50%层(浅层保留原始交互,音频更稳定), 0.0=不patch(等于没开)。\n\n有语音时建议 0.3~0.7, 纯画面控制建议 1.0。"
+                }),
             },
         }
 
@@ -349,11 +365,12 @@ class H3PromptRelay:
         "在 H3 打包自注意力中注入时间惩罚 mask，\n"
         "透传 conditioning 给采样器。\n\n"
         "global_prompt（可选）：风格/主题基调，全程对所有帧可见。\n"
-        "local_prompts：官方 prompt 原文，在分段处加 | 分隔符。"
+        "local_prompts：官方 prompt 原文，在分段处加 | 分隔符。\n"
+        "patch_ratio：打 patch 的 DiT Block 比例。有语音时建议 0.3~0.7。"
     )
 
     def apply(self, model, conditioning, clip, latent, global_prompt, local_prompts,
-              segment_lengths, epsilon):
+              segment_lengths, epsilon, patch_ratio):
         # ── 1. 解析本地 prompt ──
         locals_list = [p.strip() for p in local_prompts.split("|") if p.strip()]
         if not locals_list:
@@ -455,7 +472,7 @@ class H3PromptRelay:
 
         # ── 7. 打 patch ──
         model_clone = model.clone()
-        _apply_h3_patches(model_clone)
+        _apply_h3_patches(model_clone, patch_ratio)
 
         to = model_clone.model_options.setdefault("transformer_options", {})
         to["h3_prompt_relay_mask_fn"] = mask_fn
