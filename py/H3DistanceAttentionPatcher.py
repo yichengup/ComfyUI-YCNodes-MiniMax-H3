@@ -1,6 +1,6 @@
 """
 H3 Distance Attention Patcher (v3 - Patch Size & Frame Count Fixed)
-
+作者：亦诚
 针对 MiniMax H3 视频模型全景场景下肢体和面部容易被背景同化或扯碎的瓶颈。
 本节点采用时空高斯感受野遮罩（Gaussian Receptive Field Masking），强行约束模型在中前期去噪时的局部注意力。
 
