@@ -1,6 +1,6 @@
 """
 H3 Tiled Sampler
-
+作者：亦诚 改造自TenStrip/10S-Comfy-nodes
 H3 视频模型专属分块采样节点.
 空间分块 (H/W 轴) + cosine 融合, 严格保持 H3 视频/音频独立模态.
 
@@ -303,7 +303,7 @@ class H3TiledSampler:
     RETURN_TYPES = ("LATENT", "LATENT")
     RETURN_NAMES = ("output", "denoised_output")
     FUNCTION = "sample_tiled"
-    CATEGORY = "10S Nodes/Sampling"
+    CATEGORY = "YCNodes-MiniMax-H3/Sampling"
     DESCRIPTION = (
         "H3 视频模型专属分块采样. 沿 H/W 空间分块, 每块独立采样后 "
         "cosine 融合. 完整保留输入 latent 时长 (绝不截断), 不足时补齐. "
