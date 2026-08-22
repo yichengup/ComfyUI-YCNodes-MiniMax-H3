@@ -1,6 +1,6 @@
 """
 MiniMaxH3ImageToVideoTail 节点 —— 二采（后段采样）版 Image-to-Video 条件节点。
-
+作者：亦诚
 与官方 MiniMaxH3ImageToVideo 的关系：
     · 官方节点总是输出一个"空 AV latent"（纯噪声起点），无法用于二采续跑。
     · 本节点新增可选 video_latent 输入：
