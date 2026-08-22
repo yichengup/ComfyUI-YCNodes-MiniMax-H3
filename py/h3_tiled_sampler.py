@@ -1,6 +1,6 @@
 """
 H3 Tiled Sampler
-作者：亦诚 改造自TenStrip/10S-Comfy-nodes
+作者：亦诚 改造成H3节点，原始节点来自https://github.com/TenStrip/10S-Comfy-nodes
 H3 视频模型专属分块采样节点.
 空间分块 (H/W 轴) + cosine 融合, 严格保持 H3 视频/音频独立模态.
 
