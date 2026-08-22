@@ -1,6 +1,6 @@
 """
 H3 Prompt Relay —— MiniMax H3 时间分段提示词控制
-
+作者：亦诚
 H3 使用打包自注意力（packed self-attention，text + cond + audio + video 在
 同一序列中走同一个 self-attention），不存在独立 cross-attention。因此通过对
 自注意力矩阵中 video query → text key 的路径施加时间惩罚 mask 来实现
