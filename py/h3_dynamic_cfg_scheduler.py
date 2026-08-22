@@ -1,6 +1,6 @@
 """
 H3 Dynamic CFG Scheduler (动态CFG调度)
-
+作者：亦诚
 针对 MiniMax H3 视频模型，根据去噪阶段动态调整 CFG 引导强度。
 原理：高 sigma（早期构图）用低 CFG 保大形，低 sigma（后期细节）用高 CFG 提细节。
 
