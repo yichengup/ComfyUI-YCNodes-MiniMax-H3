@@ -15,7 +15,7 @@
 | H3 Distance Attention Patcher | 注意力 | 时空高斯感受野遮罩，防止背景同化局部细节 |
 | H3 Dynamic CFG Scheduler | scheduler | 根据去噪阶段动态调整 CFG 引导强度 |
 | H3 Sigma Refiner | scheduler | 低噪区间局部加步，消除运动边缘像素颗粒 |
-| H3 Tiled Sampler | sampling | 空间分块采样，cosine 融合，解决高分辨率显存瓶颈 |
+| H3 Tiled Sampler | sampling | 分块采样，降显存，基于[10S-Comfy-nodes](https://github.com/TenStrip/10S-Comfy-nodes)的LTX Tiled Sampler,改造而来  |
 
 ---
 
