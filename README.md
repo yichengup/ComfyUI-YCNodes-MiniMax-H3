@@ -5,7 +5,7 @@
 无第三方依赖，仅需 PyTorch。
 
 推荐一个在线一键运行的comfyui平台
-[中国国内runninghub](https://www.runninghub.cn?inviteCode=cn-v1079) ---- [国际runninghub](https://www.runninghub.ai?inviteCode=rh-v1091)
+[中国国内runninghub](https://www.runninghub.cn?inviteCode=cn-v1079) ---- [国际runninghub](https://www.runninghub.ai?inviteCode=rh-v1091) 丰富的插件和模型，点开即用
 ---
 
 ## 节点总览
