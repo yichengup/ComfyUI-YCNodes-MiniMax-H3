@@ -346,7 +346,7 @@ class H3TiledSampler:
     RETURN_TYPES = ("LATENT", "LATENT")
     RETURN_NAMES = ("output", "denoised_output")
     FUNCTION = "sample_tiled"
-    CATEGORY = "10S Nodes/Sampling"
+    CATEGORY = "YCNodes-MiniMax-H3/Sampling"
     DESCRIPTION = (
         "H3 视频模型专属 2D 分块采样 (LTX 2.3 式). 沿 H×W 分块, 每块独立采样后 "
         "可分离余弦窗口融合. 按可用显存自适应分块, 全程显存计算, 复用全局噪声与条件, "
