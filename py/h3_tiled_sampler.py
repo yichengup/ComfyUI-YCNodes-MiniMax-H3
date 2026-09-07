@@ -177,33 +177,26 @@ def _adjust_frame_count(latent_5d, target_frames, mode, debug=False):
 
 def _tile_spans(size, n_tiles, overlap):
     """
-    沿一条轴生成 [[start, end), ...] 区间, 保证:
-      - 相邻 tile 恰好重合约 overlap 个 token
-      - 所有 tile 无缝隙完整覆盖 [0, size)
-      - 首尾 tile 只在一侧有 overlap (边缘不补)
+    沿一条轴生成等长均匀重叠切片 [(start, end), ...].
+
+    每块长度完全一致, 无缝隙完整覆盖 [0, size), 相邻块重叠由实际切片位置决定.
+    首尾块只在一侧有 overlap (边缘不补).
     """
     if n_tiles <= 1 or size <= n_tiles:
         if size <= 0:
             raise ValueError(f"tile_spans: 轴长必须为正, 实际 {size}")
         return [(0, size)]
 
-    tile_eff = int(math.ceil((size + (n_tiles - 1) * overlap) / n_tiles))
-    if tile_eff - overlap <= 0:
-        # overlap 过大导致 tile_eff <= overlap, 退化为单块
-        if overlap >= size:
-            return [(0, size)]
-        tile_eff = overlap + 1
+    tile_len = min(size, max(int(math.ceil((size + (n_tiles - 1) * overlap) / n_tiles)),
+                             overlap + 1))
+    if tile_len >= size:
+        return [(0, size)]
 
+    starts = torch.linspace(0, size - tile_len, n_tiles).round().long().tolist()
     spans = []
-    for i in range(n_tiles):
-        start = i * (tile_eff - overlap)
-        end = start + tile_eff if i < n_tiles - 1 else size
-        start = max(0, start)
-        end = min(size, end)
-        if end - start <= 0:
-            continue
-        spans.append((start, end))
-    return spans or [(0, size)]
+    for s in starts:
+        spans.append((int(s), int(s + tile_len)))
+    return spans
 
 
 def _auto_split(height, width, frames, overlap, max_tiles, vram_budget_frac, debug=False):
@@ -346,7 +339,7 @@ class H3TiledSampler:
     RETURN_TYPES = ("LATENT", "LATENT")
     RETURN_NAMES = ("output", "denoised_output")
     FUNCTION = "sample_tiled"
-    CATEGORY = "YCNodes-MiniMax-H3/Sampling"
+    CATEGORY = "10S Nodes/Sampling"
     DESCRIPTION = (
         "H3 视频模型专属 2D 分块采样 (LTX 2.3 式). 沿 H×W 分块, 每块独立采样后 "
         "可分离余弦窗口融合. 按可用显存自适应分块, 全程显存计算, 复用全局噪声与条件, "
@@ -492,6 +485,7 @@ class H3TiledSampler:
                           f"{tile_samples.max().item():.3f}]")
 
                 # 8. 可分离 2D 余弦窗口 (H 轴 ± W 轴外积), 消除接缝
+                #     渐变长度固定用设定的 tile_overlap (避免每块额外算实际重叠).
                 win_h = _make_window_1d(
                     tile_h,
                     tile_overlap if h_idx > 0 else 0,
